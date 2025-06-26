@@ -14,8 +14,8 @@ Please cite our paper "Genetic exchange networks bridge mobile DNA vehicles in t
 
   (If not found, these packages are installed automatically by the pipeline.) 
 
-- [ncbi blast+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) 2.14.0
-- [python3]
+- [virsorter2](hhttps://github.com/jiarong/VirSorter2) 
+- [checkV](https://anaconda.org/bioconda/checkv
 
 The pipeline was not tested with other versions of the above programs, but other versions probably work.  
 

@@ -1,4 +1,4 @@
-# Viral Annotation
+# Phage Annotation
 
 ## Introduction
 This pipeline runs VS2 + checkV + VS2 again, and generate a file that contains information from all these outputs. It also filters phages.
@@ -36,11 +36,11 @@ cat */vs2-pass2/*_final-viral-score.tsv > allOutputs_vs2-pass2_final-viral-score
 cat */vs2-pass2/*_final-viral-combined.fa > allOutputs_vs2-pass2_final-viral-combined.fa
 ```
 
-## STEP 3: Run the 3 script that harmonized these outputs
+## STEP 3: Run the R script that harmonizes these outputs
 `allOutputs_contamination_named.tsv` and ` allOutputs_vs2-pass2_final-viral-score.tsv` can be copies on a personal machine at this step.
 
 ```
-Rscript ViralAnnotation.R -c test/all_936SRR_clean_contamination_named.tsv -v test/all_936SRR_clean_vs2-pass2_final-viral-score.tsv -f 1 -l 5000
+Rscript ViralAnnotation.R -c all_936SRR_clean_contamination_named.tsv -v all_936SRR_clean_vs2-pass2_final-viral-score.tsv -f 1 -l 5000
 ```
 
 ## STEP 3 (optional): Remove filtered phages from fasta
@@ -49,7 +49,8 @@ Rscript ViralAnnotation.R -c test/all_936SRR_clean_contamination_named.tsv -v te
 #COORD IN GENOME?
 
 ## Output description of XX.sh
- 
-
 
 ## Output description of XX.R
+
+
+

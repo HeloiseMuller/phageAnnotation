@@ -22,8 +22,8 @@ The pipeline was not tested with other versions of the above programs, but other
 ## Installation
 In a bash-compatible terminal that can execute git, paste
 ```
- git clone git@github.com:HeloiseMuller/phageAnnotation/
- cd phageAnnotation/
+git clone https://github.com/HeloiseMuller/phageAnnotation.git
+cd phageAnnotation/
 ```
 
 ## STEP 1: run VS2 + checkV + VS2

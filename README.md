@@ -1,16 +1,16 @@
 # Phage Annotation
 
 ## Introduction
-This pipeline uses existing tools to detect high quality phage sequences in large datasets, starting with a run of VirSorter2 (VS2). As recommended by VS2's GitHub page, this pipeline follows the Sullivan Lab protocole, which consists in running checkV on the VS2's outputs, and then a second run of VS2 of checkV-trimmed sequences. Finally, this pipeline calculate quality scores based on the recommendations of the Sullivan Lab protocole and scores based on the recommendations of the benchmark published in Hegarty et al. (2024).
+This pipeline uses existing tools to detect high quality phage sequences in large datasets, starting with a run of VirSorter2 (VS2). As recommended by VS2's GitHub page, this pipeline follows the Sullivan Lab protocole, which consists in running checkV on the VS2's outputs, and then a second run on VS2 of checkV-trimmed sequences. Finally, this pipeline calculate quality scores based on the recommendations of the Sullivan Lab protocole and scores based on the recommendations of the benchmark published in Hegarty et al. (2024).
 
 ## Citation
 Please cite our paper "Genetic exchange networks bridge mobile DNA vehicles in the bacterial pathogen Listeria monocytogenes"  by Muller et al.  (Publication to come).
 
 In addition, please cite the tools and benchmarks we used to develop this pipeline:
-- VirSorter2
-- checkV
-- the Sullivan Lab protocole(https://www.protocols.io/view/viral-sequence-identification-sop-with-virsorter2-5qpvoyqebg4o/v3?step=1) 
-- Hegarty et al. (2024)(https://journals.asm.org/doi/10.1128/msystems.01105-23)
+- [VirSorter2](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00990-y)
+- [checkV](https://www.nature.com/articles/s41587-020-00774-7)
+- [the Sullivan Lab protocole](https://www.protocols.io/view/viral-sequence-identification-sop-with-virsorter2-5qpvoyqebg4o/v3?step=1) 
+- [Benchmarking informatics approaches for virus discovery: caution is needed when combining in silico identification methods by Hegarty et al. (2024)](https://journals.asm.org/doi/10.1128/msystems.01105-23)
 
 ## Requirements
 - [R](https://cran.r-project.org) 4.3+ with the following packages:
@@ -20,7 +20,7 @@ In addition, please cite the tools and benchmarks we used to develop this pipeli
 
   (If not found, these packages are installed automatically by the pipeline.) 
 
-- [virsorter2](https://anaconda.org/bioconda/virsorter) 2.2.4
+- [VirSorter2](https://anaconda.org/bioconda/virsorter) 2.2.4
 - [checkV](https://anaconda.org/bioconda/checkv) 1.0.3
 
 The pipeline was not tested with other versions of the above programs, but other versions probably work.  
@@ -36,7 +36,7 @@ cd phageAnnotation/
 This first step has been written to run in array on a slurm server.  
 
 ### Get your dataset ready
-Firstly, create a dataset composed of one fasta file per genome assembly. Each fasta file names must be of the form `PATTERN_XXX_genomic.fna`. `XXX` can be anything.    
+Firstly, create a dataset composed of one fasta file per genome assembly. Each fasta file names must be of the form `PATTERN_XXX_genomic.fna`, where `XXX` can be anything.    
 Then, prepare the file `dataset.lst` in which each line contains the `PATTERN` of the genome. For example:
 ```
 SRR14908170
@@ -55,7 +55,7 @@ conda activate checkV
 If VirSorter2 and checkV are not installed in a conda environment, the above lines should be deleted.  
 
 ### Get `phageAnnotation_main.sh` ready 
-This script just runs phageAnnotation_array.sh, but in an array, allowing to easily handle hundreds/thousands of genomes:
+This script simply runs `phageAnnotation_array.sh`, but in an array, allowing to easily handle hundreds/thousands of genomes:
 
 ```
 #!/bin/bash
@@ -72,7 +72,7 @@ This script just runs phageAnnotation_array.sh, but in an array, allowing to eas
 bash phageAnnotation_array.sh $SLURM_ARRAY_TASK_ID genomesPath outputsPath dataset.lst pathDB
 ```
 In the above header, set the appropriate amount of ressources to ask for, and the appropriate paths.  
-Also set the appropriate `--array`; it determines from which genome to which genome of the `dataset.lst` file the pipeline will run for. `\%4` means that no more than the pipeline will not run more than four genomes at once. Tip: try it on just two genomes first.  
+Also set the appropriate `--array`; it determines from which genome to which genome of the file `dataset.lst` the pipeline will run for. `%4` means that the pipeline will not run more than four genomes at once. Tip: try it on just two genomes first.  
 Finally, replace the arguments of `phageAnnotation_array.sh ` accordingly to your own paths/project:
 ```
 bash phageAnnotation_array.sh $SLURM_ARRAY_TASK_ID genomesPath outputsPath dataset.lst pathDB
@@ -91,8 +91,8 @@ sbatch phageAnnotation_main.sh
 ### Output description of setp 1
 
 In the output path you provided, the pipeline will create a directory for each genome, each of which will contain the following directories:
-- `vs2-pass1/` all the outputs generated by the first run of VS2
-- `checkv/` all the outputs generated by checkV
+- `vs2-pass1/` all the outputs generated by the first run of VS2. The present pipeline add two files, ending with `_named.fa` and `named.tsv`, in order to help harmonizing all the outputs. 
+- `checkv/` all the outputs generated by checkV. The present pipeline add the file `PATTERN_combined.fna` on which the second run of VS2 will run.
 - `vs2-pass2/` all the outputs generated by the second run of VS2
 
 ## STEP 2: Combine outputs
@@ -134,29 +134,29 @@ Options:
 	-h, --help
 		Show this help message and exit
 ```
-
-The following command line runs the script using the optional -w argument (allowing to get the coordinates of the phage sequences in the genome), filter out sequences shorter than 5000 bp and sequences that do not pass at least one of the three tuning removal rule.
+Example of command line to run this step:
 ```
 Rscript phageAnnotation.R -c -allOutputs_contamination_named.tsv -v allOutputs_vs2-pass2_final-viral-score.tsv -f 1 -l 5000 -w allOutputs_vs2-pass1_final-viral-boundary.tsv
 ```
+In this example, phage sequenced under 5000 bp (`-l 5000`) and fulfilling at least one the three tuning removal rules (`-f 1`) the will be filtered out. As the optional argument `-w` is provided, the pipeline will be able to recover the coordinates of the phage sequences in the genome.
 
 ### Output description of step 3
 This script will create a folder `filtering/` where all the outputs will be saved:
 - `phages_quality.tsv` contains one line per phage sequence passing the second run of VS2. Important columns would be: 
- * `seqname`: final name of the phage sequences, as found in `allOutputs_vs2-pass2_final-viral-combined.fa`
- * `length`: final length of the phage sequences`
- * `viral_genes_checkV`: number of viral genes identified by checkV
- * `hallmark`: number of hallmark gene recovered by the second round of VS2
- * `keep_Sullivan`: classification of the phage sequence based on the Sullivan Lab protocole 
- * `Hegarty_removal_all`: tuning removal score based on Hegarty et al. (2024). Any sequence with a score<0 are sequence for which at least one of the tuning removal rule 
- * `start_inContig` and `end_inContig`: coordinates of the final phage sequence in the genome. These two columns can only be generated if the output of the first run of VS2 is provided (option `-w`)
+ 	* `seqname`: final name of the phage sequences, as found in `allOutputs_vs2-pass2_final-viral-combined.fa`
+ 	* `length`: final length of the phage sequences
+ 	* `viral_genes_checkV`: number of viral genes identified by checkV
+	* `hallmark`: number of hallmark gene recovered by the second round of VS2
+	* `keep_Sullivan`: classification of the phage sequence based on the Sullivan Lab protocole 
+	* `Hegarty_removal_all`: sum of all the tuning removal scores. Any sequence with a score<0 are sequences for which at least one of the three tuning removal rules established by Hegarty et al was fulfilled, i.e. low confidence phage sequences.
+	* `start_inContig` and `end_inContig`: coordinates of the final phage sequence in the genome. These two columns can only be generated if the output of the first run of VS2 is provided (option `-w`)
  -`phages_filtered_XXX.tsv` is the exact same file as above, except that only phage sequences passing filters are present. `XXX` varies depending on the filters chosen. 
  - `phages_filtered_XXX.lst` is a list of all seqname of phage sequences passing filters.
  
 
 ## STEP 4 (optional): Remove filtered phages from the phage fasta file
 ```
-seqtk subseq allOutputs_vs2-pass2_final-viral-combined.fa  phages_filtered_XXX.lst > phages_filtered.fasta
+seqtk subseq allOutputs_vs2-pass2_final-viral-combined.fa  phages_filtered_XXX.lst > phages_filtered_XXX.fasta
 ```
 
 

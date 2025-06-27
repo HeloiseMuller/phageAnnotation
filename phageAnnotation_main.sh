@@ -3,8 +3,8 @@
 #SBATCH --partition=batch
 #SBATCH --cpus-per-task=18
 #SBATCH --mem=64G
-#SBATCH -o /network/rit/lab/andamlab/Heloise/project_actinophages/viralAnnotation/phageAnnotation-slurm-%j.out
-#SBATCH -D /network/rit/lab/andamlab/Heloise/project_actinophages/  # working directory
+#SBATCH -o /network/rit/lab/andamlab/Heloise/project_Listeria/viralAnnotation/phageAnnotation-slurm-%j.out
+#SBATCH -D /network/rit/lab/andamlab/Heloise/project_Listeria/  # working directory
 #SBATCH -v
 
 #SBATCH --array=3-458%4

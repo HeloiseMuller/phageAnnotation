@@ -4,7 +4,7 @@
 This pipeline uses existing tools to detect high quality phage sequences in large datasets, starting with a run of VirSorter2 (VS2). As recommended by VS2's GitHub page, this pipeline follows the Sullivan Lab protocole, which consists in running checkV on the VS2's outputs, and then a second run on VS2 of checkV-trimmed sequences. Finally, this pipeline calculate quality scores based on the recommendations of the Sullivan Lab protocole and scores based on the recommendations of the benchmark published in Hegarty et al. (2024).
 
 ## Citation
-Please cite our paper "Genetic exchange networks bridge mobile DNA vehicles in the bacterial pathogen Listeria monocytogenes"  by Muller et al.  (Publication to come).
+Please cite our paper "Genetic exchange networks bridge mobile DNA vehicles in the bacterial pathogen Listeria monocytogenes"  by [Muller et al. (2025)](https://www.nature.com/articles/s41467-025-64743-x)
 
 In addition, please cite the tools and benchmarks we used to develop this pipeline:
 - [VirSorter2](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00990-y)
